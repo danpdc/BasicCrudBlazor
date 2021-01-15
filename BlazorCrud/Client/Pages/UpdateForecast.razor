@@ -1,0 +1,54 @@
+﻿@page "/editforecast/{id:int}"
+@using BlazorCrud.Shared
+@inject HttpClient Http
+@inject NavigationManager Navigation
+
+<h3>Update Forecast</h3>
+
+<div class="row">
+    <EditForm Model="@forecast" OnValidSubmit="Update">
+        <div class="form-group">
+            <label>Date: </label>
+            <InputDate @bind-Value="forecast.Date" />
+        </div>
+
+        <div class="form-group">
+            <label>Temperature (C): </label>
+            <InputNumber @bind-Value="forecast.TemperatureC" />
+        </div>
+
+        <div class="form-group">
+            <label>Temperature (F): </label>
+            <InputNumber readonly @bind-Value="forecast.TemperatureC" />
+        </div>
+
+        <div class="form-group">
+            <label>Summary: </label>
+            <InputText @bind-Value="forecast.Summary" />
+        </div>
+
+        <div class="form-group">
+            <input type="submit" class="btn btn-success" value="Update forecast" />
+            <NavLink href="fetchData" class="btn btn-info">Back to forecasts</NavLink>
+        </div>
+
+    </EditForm>
+
+</div>
+
+@code {
+    private WeatherForecast forecast = new WeatherForecast();
+    [Parameter] public int Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        forecast = await Http.GetFromJsonAsync<WeatherForecast>($"/api/weatherforecast/{Id}");
+    }
+
+    private async Task Update()
+    {
+        await Http.PutAsJsonAsync<WeatherForecast>($"/api/weatherforecast/{forecast.Id}", forecast);
+        Navigation.NavigateTo("/fetchdata");
+    }
+
+}
