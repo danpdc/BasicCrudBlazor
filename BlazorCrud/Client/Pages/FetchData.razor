@@ -32,7 +32,7 @@ else
                     <td>@forecast.Summary</td>
                     <td>
                         <button class="btn btn-danger"
-                                @onclick="(() => DeleteForecast(forecast.Id))">
+                                @onclick="(() => DeleteForecast(forecast))">
                             Delete
                         </button>
                         <button class="btn btn-info"
@@ -50,16 +50,17 @@ else
 }
 
 @code {
-    private WeatherForecast[] forecasts;
+    private List<WeatherForecast> forecasts;
 
     protected override async Task OnInitializedAsync()
     {
-        forecasts = await Http.GetFromJsonAsync<WeatherForecast[]>("/api/weatherforecast");
+        forecasts = await Http.GetFromJsonAsync<List<WeatherForecast>>("/api/weatherforecast");
     }
 
-    private async Task DeleteForecast(int id)
+    private async Task DeleteForecast(WeatherForecast forecast)
     {
-        await Http.DeleteAsync($"/api/weatherforecast/{id}");
+        await Http.DeleteAsync($"/api/weatherforecast/{forecast.Id}");
+        forecasts.Remove(forecast);
         StateHasChanged();
     }
 
